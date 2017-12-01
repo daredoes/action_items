@@ -10,16 +10,53 @@ class Root:
             'items': session.query(Action).all()
         }
 
-    def should(self, id=None, session=None, message=''):
-        item = None
+    def should(self, session=None, message='', **params):
+        item = session.action(params)
         items = session.query(Action).filter(Action.state == c.SHOULD_ACTION).all()
-        if id:
-            item = session.query(id)
+        if item.is_new:
+            pass
+        if 'name' in params:
+            pass
         return {
             'message': message,
             'item': item,
             'items': items
         }
+
+    def will(self, id=None, session=None, message='', **params):
+        item = None
+        items = session.query(Action).filter(Action.state == c.WILL_ACTION).all()
+        if id:
+            item = session.action(id)
+        return {
+            'message': message,
+            'item': item,
+            'items': items
+        }
+
+    def am(self, id=None, session=None, message='', **params):
+        item = None
+        items = session.query(Action).filter(Action.state == c.AM_ACTION).all()
+        if id:
+            item = session.action(params)
+        return {
+            'message': message,
+            'item': item,
+            'items': items
+        }
+
+    def have(self, id=None, session=None, message='', **params):
+        item = None
+        items = session.query(Action).filter(Action.state == c.HAVE_ACTION).all()
+        if id:
+            item = session.action(id)
+        return {
+            'message': message,
+            'item': item,
+            'items': items
+        }
+
+
 
     @unrestricted
     def signup(self, session,  password='', message='', **params):
