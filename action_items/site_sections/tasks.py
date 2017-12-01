@@ -7,7 +7,7 @@ class Root:
 
         return {
             'message': message,
-            'items': session.query(Soda).filter(Soda.current_quantity > 0).all()
+            'items': session.query(Action).all()
         }
 
     def should(self, id=None, session=None, message=''):
@@ -21,20 +21,6 @@ class Root:
             'items': items
         }
 
-
-    def history(self, id=None, session=None, message=''):
-        soda = session.soda(id) if id else None
-        if not soda:
-            message = 'No Soda Found.' if id else 'No Soda ID provided.'
-        return {
-            'message': message,
-            'item': soda,
-            'items': session.query(Soda).all()
-        }
-
-    def manage(self, session):
-        return ''
-
     @unrestricted
     def signup(self, session,  password='', message='', **params):
         user = session.user(params, checkgroups=User.all_checkgroups, bools=User.all_bools)
@@ -45,7 +31,7 @@ class Root:
                 session.commit()
                 password = password if password else genpasswd()
                 admin_params = {
-                    'access': '{}'.format(c.SODA),
+                    'access': '{}'.format(c.TASKS),
                     'user_id': user.id,
                     'password': password
                 }
