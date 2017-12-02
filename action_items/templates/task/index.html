@@ -1,49 +1,35 @@
 {% extends 'base.html' %}
-{% block title %} Soda Ledger{% endblock %}
+{% block page_title %}Tasks{% endblock %}
+{% block title %}Tasks{% endblock %}
 {% block content %}
-<div class="container">
+<div class="mobile-container">
+    <div class="row">
+
+    </div>
     <div class="row">
         <div class="col s12 ">
-            <div class="card grey lighten-4">
-                <div class="card-content">
-                    <span class="card-title center"><h3>Buy A Soda?</h3></span>
-                    <div class="row">
-                        <form id="choose_existing" action="add_soda" method="post">
-                    {{ csrf_token() }}
-                    <input type="hidden" value="" id="existing_id" name="id">
-
-                    </form>
-                    <form id="choose_new" action="add_soda" method="post">
-                        {{ csrf_token() }}
-                        <input type="hidden" value="True" name="new_entry">
-                    </form>
-                    <div class="row">
-                        <div class="col s12">
-                            <div class="input-field">
-
-                    <select id="choose_select" onchange="update_quantity();">
-                        <option value="" disabled selected>Choose A Soda</option>
-                        {% if c.HAS_SODA_ADMIN_ACCESS %}
-                        <option value="new">Add New Soda</option>
-                        {% endif %}
-                        {% for cat in items %}
-                        <option id='{{ cat.id }}' value="#{{ cat.id }}" data-name="{{ cat.name }}" data-id="{{ cat.id }}" data-max="{{ cat.current_quantity }}" data-price="{{ cat.current_price }}">{{ cat.name }} - ${{ cat.current_price }} - {{ cat.current_quantity }} Remaining</option>
-                        {% endfor %}
-                    </select>
-                            </div>
-                        </div>
-
-                        </div>
-                        <div class="cart" id="cart">
-                        </div>
-                        <div class="row">
-                            <div class="col s12 right-align">
-                                <span>Total: $</span><span id="total">0.00</span>
-                            </div>
-                        </div>
+            {% if items %}
+             <div class="collection">
+                 {% for i in items %}
+                 <a href="#{{ i.id }}" class="collection-item modal-trigger"><span class="badge">{{ c.ACTIONS[i.state] }}</span>{{ i.name }}</a>
+                 {% endfor %}
+              </div>
+            {% for i in items %}
+            <div id="{{ i.id }}" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                    <h4>{{ i.name }}</h4>
+                    <div class="context-text">
+                        {{ i.description }}
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+                </div>
             </div>
+            {% endfor %}
+            {% else %}
+            It looks like you don't have any tasks made! <a>Create one?</a>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -213,4 +199,8 @@
 
 {% block jquery_ready %}
 $('select').material_select();
+$('.collapsible').collapsible();
+ $('.modal').modal({
+dismissible: true
+});
 {% endblock %}

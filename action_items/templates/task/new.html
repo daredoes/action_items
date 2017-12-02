@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block page_title %} {% if item.is_new %}New {% endif -%}Task {% endblock %}
+
+{% block content %}
+<div class="mobile-container">
+    <div class="row">
+        <div class="col s12 ">
+            <div class="card grey lighten-4">
+                <div class="card-content">
+                    <form action= "new" method="post" enctype="multipart/form-data">
+                        {{ csrf_token() }}
+                        <div class="row">
+                            {% if not item.is_new %}
+                            <input type="hidden" value="{{ item.id }}" name="id" />
+                            {% endif %}
+                            <div class="input-field">
+                                <label for="name">Name</label>
+                                <input required type="text" id="name" name="name" value="{{ item.name }}" placeholder="" />
+                            </div>
+                            <div class="input-field">
+                                <label for="date">Task Start Date (Optional)</label>
+                                <input type="text" id="state" value="{{ item.state }}" name="{% if item.state == c.WILL_ACTION %}state{% endif %}" hidden />
+                                <input type="text" class="datepicker" id="date" name="{{ 'date_started' if item.date_started != None else ''}}" onchange="isWill()" value="{{ item.date_started if item.date_started != None else '' }}" {{ 'disabled' if item.state == c.HAVE_ACTION else '' }} />
+                            </div>
+                            <div class="input-field">
+                                <label for="end_date">{{ 'Task Completed Date' if item.date_completed else 'To Be Completed'}}</label>
+                                <input type="text" class="datepicker" id="end_date" value="{{ item.date_completed if item.date_completed != None else '' }}" disabled/>
+                            </div>
+                            <div class="input-field">
+                                <label for="description">Description</label>
+                                <textarea name="description" class="writeblock" id="description" >{{item.description}}</textarea>
+                            </div>
+                            <div class="input-field center">
+                                <input type="submit" value="Save" class="waves-effect waves-light btn"/>
+                                </form>
+                                {% if c.HAS_SODA_ADMIN_ACCESS %}
+                                <form action="delete" method="post">
+                                    <input type="hidden" value="{{ item.id }}" name="id"/>
+                                    <input type="hidden" value="item" name="option"/>
+                                <input type="submit" value="Delete" class="waves-effect waves-light btn" />
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var openPage = function(value){
+      window.open(value, "_self");
+    };
+
+    var isWill = function(){
+      var date = $('#date');
+      var state = $('#state');
+      if (date.val() != ''){
+          state.attr({
+              'name': 'state'
+          });
+          state.val('{{ item.state if item.state != c.SHOULD_ACTION else c.WILL_ACTION }}')
+          date.attr({
+              'name': 'date_started'
+          });
+
+      }
+      else{
+          state.removeAttr('name');
+          date.removeAttr('name');
+          state.val('{{ c.SHOULD_ACTION }}')
+      }
+    };
+
+     var choose_existing = function(id){
+        document.getElementById('existing_id').value = id;
+        document.getElementById('choose_existing').submit();
+    };
+    var choose_select_change = function(){
+        var val = document.getElementById('choose_select').value;
+        if(val) {
+            if (val == 'new') {
+                document.getElementById('choose_new').submit();
+            }
+            else{
+                choose_existing(val);
+            }
+        }
+    };
+
+     var publicCheck = function(element){
+        var hiddenID = element.id + "h";
+        var hiddenElem = $("#" + hiddenID);
+
+        console.log(element.checked);
+        if(element.checked){
+
+            hiddenElem.prop("checked", false);
+        }
+        else{
+            hiddenElem.prop("checked", true);
+        }
+        console.log(hiddenElem.prop('checked'));
+    };
+
+</script>
+{% endblock %}
+
+{% block jquery_ready %}
+$('select').material_select();
+$('.writeblock').trumbowyg();
+$('.datepicker').pickadate({
+    selectMonths: true, // Creates a dropdown to control month
+    selectYears: 15, // Creates a dropdown of 15 years to control year,
+    today: 'Today',
+    clear: 'Clear',
+    close: 'Ok',
+    closeOnSelect: false // Close upon selecting a date,
+  });
+{% endblock %}

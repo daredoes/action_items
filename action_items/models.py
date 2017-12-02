@@ -3,8 +3,9 @@ from action_items import *
 class Action(MainModel):
     name = Column(UnicodeText)
     description = Column(UnicodeText)
-    date_started = Column(UTCDateTime, nullable=True)
-    date_completed = Column(UTCDateTime, nullable=True)
+    date_started = Column(Date, nullable=True)
+    date_completed = Column(Date, nullable=True)
+    priority = Column(Integer, default=0)
     state = Column(Choice(c.ACTION_OPTS), default=c.SHOULD_ACTION)
 
     @presave_adjustment

@@ -10,6 +10,20 @@ class Root:
             'items': session.query(Action).all()
         }
 
+    def new(self, session, message='', new_entry=None, **params):
+        item = session.action(params)
+
+        if 'name' in params:
+            session.add(item)
+            session.commit()
+        items = session.query(Action).all()
+        return {
+            'message': message,
+            'item': item,
+            'new_entry': new_entry,
+            'items': items
+        }
+
     def should(self, session=None, message='', **params):
         item = session.action(params)
         items = session.query(Action).filter(Action.state == c.SHOULD_ACTION).all()
