@@ -8,34 +8,99 @@
     </div>
     <div class="row">
         <div class="col s12 ">
-            {% if items %}
-             <div class="collection">
-                 {% for i in items %}
-                 <a href="#{{ i.id }}" class="collection-item modal-trigger"><span class="badge">{{ c.ACTIONS[i.state] }}</span>{{ i.name }}</a>
-                 {% endfor %}
-              </div>
-            {% for i in items %}
-            <div id="{{ i.id }}" class="modal modal-fixed-footer">
-                <div class="modal-content">
-                    <h4>{{ i.name }}</h4>
-                    <div class="context-text">
-                        {{ i.description }}
+            <div class="row">
+                <div class="col s12">
+                  <ul class="tabs">
+                    <li class="tab col s2"><a class='active' href="#all">All</a></li>
+                    <li class="tab col s2"><a  href="#should">Should</a></li>
+                    <li class="tab col s2"><a href="#will">Will</a></li>
+                    <li class="tab col s2"><a href="#am">Am</a></li>
+                      <li class="tab col s2"><a href="#have">Have</a></li>
+                      <li class="tab col s2"><a href="#create" onclick="open_task('')">Create</a></li>
+                  </ul>
+                </div>
+                <div id="all" class="col s12">
+                    <div class="collection">
+                        {% for i in items|sort(attribute='priority', reverse=True) %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        {% endfor %}
+                        {% if items|length == 0 %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+                <div id="should" class="col s12">
+                    <div class="collection">
+                        {% set section_items = items|rejectattr('state', '!=', c.SHOULD_ACTION)|sort(attribute='priority', reverse=True)|list %}
+                        {% if section_items|length != 0 %}
+                        {% for i in section_items %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        {% endfor %}
+                        {% else %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
+                        {% endif %}
+                    </div>
+
                 </div>
+                <div id="will" class="col s12">
+                    <div class="collection">
+                        {% set section_items = items|rejectattr('state', '!=', c.WILL_ACTION)|sort(attribute='date_started')|sort(attribute='priority', reverse=True)|list %}
+                        {% if section_items|length != 0 %}
+
+                        {% for i in section_items %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        {% endfor %}
+                        {% else %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
+                        {% endif %}
+                    </div>
+
+                </div>
+                <div id="am" class="col s12">
+                    <div class="collection">
+                        {% set section_items = items|rejectattr('state', '!=', c.AM_ACTION)|sort(attribute='date_started')|sort(attribute='priority', reverse=True)|list %}
+                        {% if section_items|length != 0 %}
+                        {% for i in section_items %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        {% endfor %}
+                        {% else %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
+                        {% endif %}
+                    </div>
+
+                </div>
+                <div id="have" class="col s12">
+                    <div class="collection">
+                        {% set section_items = items|rejectattr('state', '!=', c.HAVE_ACTION)|sort(attribute='date_completed')|sort(attribute='priority', reverse=True)|list %}
+                        {% if section_items|length != 0 %}
+                        {% for i in section_items %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        {% endfor %}
+
+                        {% else %}
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
+                        {% endif %}
+                    </div>
+
+                </div>
+              </div>
+
+            <div class="modal modal-fixed-footer" id="create">
+                <form id="task_create_form" action="update_task" method="POST">
+                <div class="modal-content" id="task_content">
+
+                </div>
+                <div class="modal-footer">
+                    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+                    <input type="submit" value="Update" class="waves-effect waves-green btn-flat"/>
+                </div>
+                </form>
             </div>
-            {% endfor %}
-            {% else %}
-            It looks like you don't have any tasks made! <a>Create one?</a>
-            {% endif %}
         </div>
     </div>
 </div>
 <script>
-    var global_num = 1;
-    var total_price = 0;
+
     var openPage = function(value){
       window.open(value, "_self");
     };
@@ -56,142 +121,40 @@
         }
     };
 
-    var update_quantity = function(id){
-      var current_value  = $('#choose_select').val();
-      var current_option = $(current_value);
-      var current_price = current_option.data('price');
-      var current_id = current_option.data('id');
-      var current_name = current_option.data('name');
-      var current_quantity = current_option.data('max');
-
-      if(current_name) {
-          current_option.attr({
-              'disabled': true
-          });
-          $('#cart').append(create_cart_element(current_id, current_name, current_price, current_quantity));
-          get_total_price();
-      }
-    };
-
-    var create_cart_element = function(id, name, price, quantity){
-        var row_element = $("<div></div>");
-        var name_col = $("<div></div>");
-        var quantity_col = $("<div></div>");
-        var minus_col = $("<div></div>");
-        var price_col = $("<div></div>");
-
-        var name_input_div = $("<div></div>");
-        var quantity_input_div = $("<div></div>");
-        var minus_input_div = $("<div></div>");
-        var price_input_div = $("<div></div>");
-
-        var name_input = $("<input/>");
-        var quantity_input = $("<input/>");
-        var minus_input = $("<a></a>");
-        var id_input= $("<input/>");
-        var minus_icon = $("<i></i>");
-        var price_input = $("<input />");
-
-        var name_label = $("<label></label>");
-        var quantity_label = $("<label></label>");
-        var price_label = $("<label></label>");
-
-        row_element.addClass('row');
-        name_col.addClass("col s9 m4 l8");
-        price_col.addClass("col s3 m2 l2");
-        quantity_col.addClass("col s6 m3 l1");
-        minus_col.addClass("col s6 m3 l1");
-        name_input_div.addClass("input-field");
-        quantity_input_div.addClass("input-field");
-        minus_input_div.addClass("input-field center");
-        price_input_div.addClass("input-field");
-        minus_icon.addClass("fa");
-        minus_icon.addClass("fa-minus");
-        minus_icon.addClass("fa-3x");
-
-        name_input.addClass('fake-disabled');
-        price_input.addClass('fake-disabled');
-
-        name_input.val(name);
-        price_input.val(price);
-        quantity_input.val(1);
-        id_input.val(id);
-        quantity_label.text('Quantity');
-        name_label.text('Name');
-        price_label.text('Price Per Item');
-
-        name_input.attr({
-            'disabled': true,
-            'id': 'name'+global_num,
-            'value': name
+    var open_task = function(id){
+        if(id){
+            var data = {
+                'id': id,
+                'csrf_token': csrf_token
+            }
+        }
+        else{
+            var data = {
+                'csrf_token': csrf_token
+            }
+        }
+        $.ajax({
+            url: 'get_task_modal',
+            method: 'POST',
+            data: data,
+            success: function(e){
+                Materialize.toast(e.message, 3000);
+                if(e.status){
+                    var task = $("#task_content");
+                    task.empty();
+                    task.append(e.code);
+                    $('.writeblock').trumbowyg();
+                    $('.datepicker').pickadate({
+                        selectMonths: true, // Creates a dropdown to control month
+                        selectYears: 15, // Creates a dropdown of 15 years to control year,
+                        today: 'Today',
+                        clear: 'Clear',
+                        close: 'Ok',
+                        closeOnSelect: false // Close upon selecting a date,
+                      });
+                }
+            }
         });
-
-        id_input.attr({
-            'hidden': true,
-            'name': 'id'
-        });
-
-        quantity_input.attr({
-            'min': 0,
-            'max': quantity,
-            'required': true,
-            'id': 'quantity' + global_num,
-            'type': 'number',
-            'onchange': 'get_total_price()'
-        });
-
-        price_input.attr({
-            'disabled': true,
-            'id': 'price' + global_num,
-            'step': 0.01,
-            'type': 'number'
-        });
-
-        quantity_label.attr({
-            'for': 'quantity'+ global_num
-        });
-
-        name_label.attr({
-            'for': 'name' + global_num
-        });
-
-        price_label.attr({
-            'for': 'price' + global_num
-        });
-
-        global_num += 1;
-
-        minus_input.append(minus_icon);
-
-        //name_input_div.append(name_label);
-        name_input_div.append(name_input);
-        //quantity_input_div.append(quantity_label);
-        quantity_input_div.append(quantity_input);
-        minus_input_div.append(minus_input);
-        //price_input_div.append(price_label);
-        price_input_div.append(price_input);
-
-        name_col.append(name_input_div);
-        quantity_col.append(quantity_input_div);
-        minus_col.append(minus_input_div);
-        price_col.append(price_input_div);
-
-        row_element.append(name_col);
-        row_element.append(price_col);
-        row_element.append(quantity_col);
-        row_element.append(minus_col);
-
-        return row_element;
-
-    };
-
-    var get_total_price = function(){
-    total_price = 0;
-    for(var i = 1; i < global_num; i++){
-          total_price += $("#price" + i).val() * $("#quantity" + i).val();
-    }
-    $("#total").text(total_price);
-    return total_price;
     };
 
 </script>
@@ -202,5 +165,20 @@ $('select').material_select();
 $('.collapsible').collapsible();
  $('.modal').modal({
 dismissible: true
+});
+$('.writeblock').trumbowyg();
+$('.datepicker').pickadate({
+    selectMonths: true, // Creates a dropdown to control month
+    selectYears: 15, // Creates a dropdown of 15 years to control year,
+    today: 'Today',
+    clear: 'Clear',
+    close: 'Ok',
+    closeOnSelect: false // Close upon selecting a date,
+  });
+
+$("#task_create_form").ajaxForm(function(e){
+    if(e.status){
+        location.reload();
+    }
 });
 {% endblock %}

@@ -1,0 +1,50 @@
+<div class="row">
+    {% if not item.is_new %}
+    <input type="hidden" value="{{ item.id }}" name="id" />
+    {% endif %}
+    <input type="hidden" value="{{ c.CURRENT_ADMIN['id'] }}" name="user_id" />
+    <input type="hidden" value="{{ c.CSRF_TOKEN }}" name="csrf_token" />
+
+    <div class="input-field">
+        <label for="name"  class="active">Name</label>
+        <input required type="text" id="name" name="name" value="{{ item.name }}" placeholder="Name " />
+    </div>
+    <div class="input-field">
+        <label for="priority" class="active">Priority</label>
+    <input required type="number" id="priority" name="priority" value="{{ item.priority }}" />
+    </div>
+    <div class="input-field">
+        <label for="date" class="active">Start Date (Optional)</label>
+        <input type="text" id="state" value="{{ item.state }}" name="{% if item.state == c.WILL_ACTION %}state{% endif %}" hidden />
+        <input type="text" class="datepicker" id="date" name="{{ 'date_started' if item.date_started != None else ''}}" onchange="isWill()" value="{{ item.date_started if item.date_started != None else '' }}" {{ 'disabled' if item.state == c.HAVE_ACTION else '' }} />
+    </div>
+    <div class="input-field">
+        <label for="end_date">{{ 'Task Completed Date' if item.date_completed else 'To Be Completed'}}</label>
+        <input type="text" class="datepicker" id="end_date" value="{{ item.date_completed if item.date_completed != None else '' }}" disabled/>
+    </div>
+    <div class="input-field">
+        <label for="description">Description</label>
+        <textarea name="description" class="writeblock" id="description" >{{item.description}}</textarea>
+    </div>
+</div>
+<script>
+    var isWill = function(){
+      var date = $('#date');
+      var state = $('#state');
+      if (date.val() != ''){
+          state.attr({
+              'name': 'state'
+          });
+          state.val('{{ item.state if item.state != c.SHOULD_ACTION else c.WILL_ACTION }}')
+          date.attr({
+              'name': 'date_started'
+          });
+
+      }
+      else{
+          state.removeAttr('name');
+          date.removeAttr('name');
+          state.val('{{ c.SHOULD_ACTION }}')
+      }
+    };
+</script>

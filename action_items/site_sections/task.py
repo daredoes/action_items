@@ -7,7 +7,7 @@ class Root:
 
         return {
             'message': message,
-            'items': session.query(Action).all()
+            'items': session.query(Action).filter(Action.user_id == c.CURRENT_ADMIN['id']).all()
         }
 
     def new(self, session, message='', new_entry=None, **params):
@@ -24,53 +24,36 @@ class Root:
             'items': items
         }
 
-    def should(self, session=None, message='', **params):
+    @ajax_gettable
+    def get_task_modal(self, session, **params):
+        code = ''
+        status = False
+        message = 'ID not found'
         item = session.action(params)
-        items = session.query(Action).filter(Action.state == c.SHOULD_ACTION).all()
-        if item.is_new:
-            pass
+        if item:
+            message = ''
+            status = True
+            code = render('/partials/task_modal.html', {'item': item}).decode('utf-8')
+        return {
+            'status': status,
+            'code': code,
+            'message': message
+        }
+
+    @ajax
+    def update_task(self, session, **params):
+        status = False
+        message = 'Task Not Found.'
+        task = session.action(params)
         if 'name' in params:
-            pass
+            session.add(task)
+            session.commit()
+            message = 'Task updated.'
+            status = True
         return {
-            'message': message,
-            'item': item,
-            'items': items
+            'status': status,
+            'message': message
         }
-
-    def will(self, id=None, session=None, message='', **params):
-        item = None
-        items = session.query(Action).filter(Action.state == c.WILL_ACTION).all()
-        if id:
-            item = session.action(id)
-        return {
-            'message': message,
-            'item': item,
-            'items': items
-        }
-
-    def am(self, id=None, session=None, message='', **params):
-        item = None
-        items = session.query(Action).filter(Action.state == c.AM_ACTION).all()
-        if id:
-            item = session.action(params)
-        return {
-            'message': message,
-            'item': item,
-            'items': items
-        }
-
-    def have(self, id=None, session=None, message='', **params):
-        item = None
-        items = session.query(Action).filter(Action.state == c.HAVE_ACTION).all()
-        if id:
-            item = session.action(id)
-        return {
-            'message': message,
-            'item': item,
-            'items': items
-        }
-
-
 
     @unrestricted
     def signup(self, session,  password='', message='', **params):

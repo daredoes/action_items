@@ -1,5 +1,10 @@
 from action_items import *
 
+@Session.model_mixin
+class User:
+    actions = relationship('Action', backref='user')
+
+
 class Action(MainModel):
     name = Column(UnicodeText)
     description = Column(UnicodeText)
@@ -7,6 +12,7 @@ class Action(MainModel):
     date_completed = Column(Date, nullable=True)
     priority = Column(Integer, default=0)
     state = Column(Choice(c.ACTION_OPTS), default=c.SHOULD_ACTION)
+    user_id = Column(UUID, ForeignKey('user.id'))
 
     @presave_adjustment
     def _misc_adjustments(self):
