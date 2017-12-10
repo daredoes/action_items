@@ -10,7 +10,7 @@ class Action(MainModel):
     description = Column(UnicodeText)
     date_started = Column(Date, nullable=True)
     date_completed = Column(Date, nullable=True)
-    priority = Column(Integer, default=0)
+    priority = Column(Float, default=0)
     state = Column(Choice(c.ACTION_OPTS), default=c.SHOULD_ACTION)
     user_id = Column(UUID, ForeignKey('user.id'))
 

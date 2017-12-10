@@ -22,7 +22,7 @@
                 <div id="all" class="col s12">
                     <div class="collection">
                         {% for i in items|sort(attribute='priority', reverse=True) %}
-                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ '{:,.2f}'.format(i.priority) }}</span>{{ i.name }}</a>
                         {% endfor %}
                         {% if items|length == 0 %}
                         <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
@@ -34,7 +34,7 @@
                         {% set section_items = items|rejectattr('state', '!=', c.SHOULD_ACTION)|sort(attribute='priority', reverse=True)|list %}
                         {% if section_items|length != 0 %}
                         {% for i in section_items %}
-                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ '{:,.2f}'.format(i.priority) }}</span>{{ i.name }}</a>
                         {% endfor %}
                         {% else %}
                         <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
@@ -48,7 +48,7 @@
                         {% if section_items|length != 0 %}
 
                         {% for i in section_items %}
-                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ '{:,.2f}'.format(i.priority) }}</span>{{ i.name }}</a>
                         {% endfor %}
                         {% else %}
                         <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
@@ -61,7 +61,7 @@
                         {% set section_items = items|rejectattr('state', '!=', c.AM_ACTION)|sort(attribute='date_started')|sort(attribute='priority', reverse=True)|list %}
                         {% if section_items|length != 0 %}
                         {% for i in section_items %}
-                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ '{:,.2f}'.format(i.priority) }}</span>{{ i.name }}</a>
                         {% endfor %}
                         {% else %}
                         <a href="#create" class="collection-item modal-trigger" onclick="open_task('');">Create New Task</a>
@@ -74,7 +74,7 @@
                         {% set section_items = items|rejectattr('state', '!=', c.HAVE_ACTION)|sort(attribute='date_completed')|sort(attribute='priority', reverse=True)|list %}
                         {% if section_items|length != 0 %}
                         {% for i in section_items %}
-                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ i.priority }}</span>{{ i.name }}</a>
+                        <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ '{:,.2f}'.format(i.priority) }}</span>{{ i.name }}</a>
                         {% endfor %}
 
                         {% else %}
