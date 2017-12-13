@@ -31,7 +31,7 @@
                 </div>
                 <div id="should" class="col s12">
                     <div class="collection">
-                        {% set section_items = items|rejectattr('state', 'ne', c.SHOULD_ACTION)|sort(attribute='priority', reverse=True)|list %}
+                        {% set section_items = items|rejectattr('state', "ne", c.SHOULD_ACTION)|sort(attribute='priority', reverse=True)|list %}
                         {% if section_items|length != 0 %}
                         {% for i in section_items %}
                         <a href="#create" class="collection-item modal-trigger" onclick="open_task('{{ i.id }}');"><span class="badge">{{ c.ACTIONS[i.state] }} - {{ '{:,.2f}'.format(i.priority) }}</span>{{ i.name }}</a>
